@@ -127,17 +127,16 @@ WHERE
 #Include a column indicating whether each title is 'Available' or 'NOT available.
 # there are 42 titles that are not in the inventory, and this information can be obtained using a CASE statement combined with IFNULL.
 SELECT
-	DISTINCT(f.title) AS 'film',
+    DISTINCT f.title AS 'film',
     CASE
-		WHEN ISNULL(i.film_id) THEN 'Not Available'
-        ELSE 'Available'
-	END AS 'availability'
+        WHEN COUNT(i.film_id) > 0 THEN 'Available'
+        WHEN COUNT(i.film_id) = 0 AND ISNULL(i.film_id) THEN 'Not Available'
+    END AS 'availability'
 FROM
-	film AS f
+    film AS f
 LEFT JOIN
-	inventory as i
-ON
+    inventory AS i 
+ON 
 	f.film_id = i.film_id
-
-	
-	
+GROUP BY
+    f.film_id;
