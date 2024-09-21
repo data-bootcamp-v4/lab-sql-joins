@@ -2,6 +2,7 @@
 
 # LAB | SQL Joins
 
+
 <details>
   <summary>
    <h2>Learning Goals</h2>
