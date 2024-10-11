@@ -51,8 +51,62 @@ ORDER BY Average_runtime;
 #Bonus:
 
 #5.Identify the film categories with the longest average running time.
+#--------------------------------------------MY_ANSWER--------------------------------------------#
+SELECT category.name,film.length
+FROM category
+INNER JOIN film_category USING(category_id)
+INNER JOIN film USING(film_id)
+GROUP BY category.length
+ORDER BY length DESC
+LIMIT 10;
+#--------------------------------------------SOLUTION--------------------------------------------#
+SELECT category.name, AVG(film.length) AS avg_length
+FROM category
+INNER JOIN film_category USING (category_id)
+INNER JOIN film USING (film_id)
+GROUP BY category.name
+ORDER BY avg_length DESC
+LIMIT 10;
+
 #6.Display the top 10 most frequently rented movies in descending order.
+
+SELECT film.title,COUNT(rental.rental_id) AS Frequency
+FROM rental
+INNER JOIN inventory USING(inventory_id)
+INNER JOIN film USING (film_id)
+GROUP BY film.title
+ORDER BY COUNT(rental.rental_id) DESC
+LIMIT 10;
+
+
 #7.Determine if "Academy Dinosaur" can be rented from Store 1.
+
+SELECT film.title,store_id,inventory.inventory_id
+FROM film
+INNER JOIN inventory USING(film_id)
+INNER JOIN  store USING(store_id)
+WHERE film.title="Academy Dinosaur" AND store_id=1;
+
+
+
 #8.Provide a list of all distinct film titles, along with their availability status in the inventory. 
 		#Include a column indicating whether each title is 'Available' or 'NOT available.' 
         #Note that there are 42 titles that are not in the inventory, and this information can be obtained using a CASE statement combined with IFNULL."
+ #--------------------------------------------MY_ANSWER--------------------------------------------#       
+SELECT DISTINCT film.title,inventory.inventory_id,rental.inventory_id
+FROM film
+INNER JOIN inventory USING(film_id)
+INNER JOIN  rent USING(inventory_id)
+WHERE rental.inventory_id = inventory.inventory_id THEN 'NOT available'
+WHERE rental.inventory_id != inventory.inventory_id THEN 'Available'
+WHERE IFNULL(
+
+#--------------------------------------------SOLUTION 1--------------------------------------------#
+SELECT DISTINCT film.title,
+       CASE
+           WHEN inventory.inventory_id IS NULL THEN 'Not Available'
+           ELSE 'Available'
+       END AS availability_status
+FROM film
+LEFT JOIN inventory USING (film_id);
+
