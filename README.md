@@ -45,7 +45,7 @@ In this lab, you will be working with the [Sakila](https://dev.mysql.com/doc/sak
 ## Challenge - Joining on multiple tables
 
 Write SQL queries to perform the following tasks using the Sakila database:
-
+git add
 
 1. List the number of films per category.
 2. Retrieve the store ID, city, and country for each store.
