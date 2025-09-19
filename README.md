@@ -1,38 +1,20 @@
 ![logo_ironhack_blue 7](https://user-images.githubusercontent.com/23629340/40541063-a07a0a8a-601a-11e8-91b5-2f13e4e6b441.png)
 
 # LAB | SQL Joins
+Before starting this lab, we learned to be proficient in:
 
-<details>
-  <summary>
-   <h2>Learning Goals</h2>
-  </summary>
+Basic SQL clauses: SELECT, FROM, ORDER BY, LIMIT, WHERE, GROUP BY, HAVING
 
-  This lab allows you to practice and apply the concepts and techniques taught in class. 
+Keywords: DISTINCT, AS
 
-  Upon completion of this lab, you will be able to:
-  
-- Use SQL joins to combine data from multiple tables, such as inner, outer, left, right or self-joins.
+Built-in functions: COUNT, MAX, MIN, AVG, ROUND, DATEDIFF, DATE_FORMAT
 
-  <br>
-  <hr> 
+Join operations: INNER JOIN, LEFT JOIN, RIGHT JOIN
 
-</details>
+Use of CASE and IFNULL for conditional logic
 
-<details>
-  <summary>
-   <h2>Prerequisites</h2>
-  </summary>
+Table aliasing for query clarity
 
-Before this starting this lab, you should have learnt about:
-
-- SELECT, FROM, ORDER BY, LIMIT, WHERE, GROUP BY, and HAVING clauses. DISTINCT, AS keywords.
-- Built-in SQL functions such as COUNT, MAX, MIN, AVG, ROUND, DATEDIFF, or DATE_FORMAT.
-- Using JOIN to combine data from multiple tables.
- 
-  <br>
-  <hr> 
-
-</details>
 
 
 ## Introduction
