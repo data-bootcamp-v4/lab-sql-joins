@@ -35,12 +35,14 @@ ORDER BY avg_running_time DESC;
 
 -- Bonus:
 -- 5.Identify the film categories with the longest average running time.
-SELECT title, length
-FROM FILM 
-WHERE length > (
-SELECT AVG(length)
-FROM film
-);
+SELECT c.name, AVG(f.length) AS avg_length
+FROM category AS c 
+LEFT JOIN film_category AS fc ON c.category_id = fc.category_id
+LEFT JOIN film AS f ON fc.film_id = f.film_id
+GROUP BY c.name
+HAVING AVG(f.length) > (SELECT AVG(length) FROM film)
+ORDER BY avg_length DESC;
+
 -- 6. Display the top 10 most frequently rented movies in descending order.
 SELECT f.title, COUNT(r.rental_id) AS rental_count 
 FROM film AS F
