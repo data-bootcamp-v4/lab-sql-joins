@@ -95,3 +95,4 @@ git push origin master
 
 - Paste the link of your lab in Student Portal.
 
+solved
