@@ -84,3 +84,5 @@ SELECT DISTINCT f.title,
 FROM film f
 LEFT JOIN inventory i ON f.film_id = i.film_id
 ORDER BY availability, f.title;
+
+
