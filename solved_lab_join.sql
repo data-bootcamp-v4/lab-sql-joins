@@ -50,3 +50,41 @@ GROUP BY
     c.name
 ;
 
+SELECT 
+    c.name AS category_name,
+    ROUND(AVG(f.length), 2) AS average_running_time
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+GROUP BY c.name
+ORDER BY average_running_time DESC;
+
+SELECT 
+    f.title AS film_title,
+    COUNT(r.rental_id) AS rental_count
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+ORDER BY rental_count DESC
+LIMIT 10;
+
+SELECT 
+    f.title,
+    i.store_id,
+    COUNT(i.inventory_id) AS copies_in_stock
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+WHERE f.title = 'Academy Dinosaur' AND i.store_id = 1
+GROUP BY f.title, i.store_id;
+
+SELECT 
+    f.title AS film_title,
+    CASE 
+        WHEN IFNULL(i.inventory_id, 0) = 0 THEN 'NOT available'
+        ELSE 'Available'
+    END AS availability_status
+FROM film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+GROUP BY f.film_id, f.title
+ORDER BY f.title ASC;
