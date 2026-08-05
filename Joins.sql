@@ -1,13 +1,13 @@
 USE sakila;
 
-# ==================================================
-# CHALLENGE 1
-# List the number of films per category
-# ==================================================
+
+-- ==================================================
+-- 1. LIST THE NUMBER OF FILMS PER CATEGORY
+-- ==================================================
 
 SELECT
-    c.name AS Category_name,
-    COUNT(fc.film_id) AS Number_of_films
+    c.name AS category_name,
+    COUNT(fc.film_id) AS number_of_films
 FROM category AS c
 LEFT JOIN film_category AS fc
     ON c.category_id = fc.category_id
@@ -15,19 +15,19 @@ GROUP BY
     c.category_id,
     c.name
 ORDER BY
-    Number_of_films DESC;
+    number_of_films DESC,
+    category_name ASC;
 
 
-# ==================================================
-# CHALLENGE 2
-# Retrieve the store ID, city, and country
-# for each store
-# ==================================================
+-- ==================================================
+-- 2. RETRIEVE THE STORE ID, CITY, AND COUNTRY
+-- FOR EACH STORE
+-- ==================================================
 
 SELECT
-    s.store_id AS Store_ID,
-    ci.city AS City,
-    co.country AS Country
+    s.store_id AS store_id,
+    ci.city AS city,
+    co.country AS country
 FROM store AS s
 INNER JOIN address AS a
     ON s.address_id = a.address_id
@@ -39,35 +39,33 @@ ORDER BY
     s.store_id;
 
 
-# ==================================================
-# CHALLENGE 3
-# Calculate the total revenue generated
-# by each store
-# ==================================================
+-- ==================================================
+-- 3. CALCULATE THE TOTAL REVENUE GENERATED
+-- BY EACH STORE
+-- ==================================================
 
 SELECT
-    st.store_id AS Store_ID,
-    ROUND(SUM(p.amount), 2) AS Total_revenue
-FROM store AS st
-INNER JOIN staff AS sf
-    ON st.store_id = sf.store_id
+    s.store_id AS store_id,
+    ROUND(SUM(p.amount), 2) AS total_revenue
+FROM store AS s
+INNER JOIN staff AS st
+    ON s.store_id = st.store_id
 INNER JOIN payment AS p
-    ON sf.staff_id = p.staff_id
+    ON st.staff_id = p.staff_id
 GROUP BY
-    st.store_id
+    s.store_id
 ORDER BY
-    st.store_id;
+    s.store_id;
 
 
-# ==================================================
-# CHALLENGE 4
-# Determine the average running time
-# of films for each category
-# ==================================================
+-- ==================================================
+-- 4. DETERMINE THE AVERAGE RUNNING TIME
+-- OF FILMS FOR EACH CATEGORY
+-- ==================================================
 
 SELECT
-    c.name AS Category_name,
-    ROUND(AVG(f.length), 2) AS Average_running_time
+    c.name AS category_name,
+    ROUND(AVG(f.length), 2) AS average_running_time
 FROM category AS c
 INNER JOIN film_category AS fc
     ON c.category_id = fc.category_id
@@ -77,18 +75,19 @@ GROUP BY
     c.category_id,
     c.name
 ORDER BY
-    Average_running_time DESC;
+    average_running_time DESC,
+    category_name ASC;
 
 
-# ==================================================
-# BONUS 1
-# Identify the film category with the longest
-# average running time
-# ==================================================
+-- ==================================================
+-- BONUS 1
+-- IDENTIFY THE FILM CATEGORY WITH THE LONGEST
+-- AVERAGE RUNNING TIME
+-- ==================================================
 
 SELECT
-    c.name AS Category_name,
-    ROUND(AVG(f.length), 2) AS Average_running_time
+    c.name AS category_name,
+    ROUND(AVG(f.length), 2) AS average_running_time
 FROM category AS c
 INNER JOIN film_category AS fc
     ON c.category_id = fc.category_id
@@ -98,18 +97,52 @@ GROUP BY
     c.category_id,
     c.name
 ORDER BY
-    Average_running_time DESC
+    average_running_time DESC
 LIMIT 1;
 
 
-# ==================================================
-# BONUS 2
-# Display the top 10 most frequently rented movies
-# ==================================================
+-- ==================================================
+-- BONUS 1 ALTERNATIVE
+-- RETURN ALL CATEGORIES TIED FOR THE LONGEST
+-- AVERAGE RUNNING TIME
+-- ==================================================
+
+WITH category_averages AS
+(
+    SELECT
+        c.category_id,
+        c.name AS category_name,
+        AVG(f.length) AS average_running_time
+    FROM category AS c
+    INNER JOIN film_category AS fc
+        ON c.category_id = fc.category_id
+    INNER JOIN film AS f
+        ON fc.film_id = f.film_id
+    GROUP BY
+        c.category_id,
+        c.name
+)
 
 SELECT
-    f.title AS Film_title,
-    COUNT(r.rental_id) AS Number_of_rentals
+    category_name,
+    ROUND(average_running_time, 2) AS average_running_time
+FROM category_averages
+WHERE average_running_time =
+(
+    SELECT MAX(average_running_time)
+    FROM category_averages
+);
+
+
+-- ==================================================
+-- BONUS 2
+-- DISPLAY THE TOP 10 MOST FREQUENTLY RENTED MOVIES
+-- IN DESCENDING ORDER
+-- ==================================================
+
+SELECT
+    f.title AS film_title,
+    COUNT(r.rental_id) AS number_of_rentals
 FROM film AS f
 INNER JOIN inventory AS i
     ON f.film_id = i.film_id
@@ -119,73 +152,95 @@ GROUP BY
     f.film_id,
     f.title
 ORDER BY
-    Number_of_rentals DESC,
-    f.title
+    number_of_rentals DESC,
+    film_title ASC
 LIMIT 10;
 
 
-# ==================================================
-# BONUS 3
-# Determine whether Academy Dinosaur can currently
-# be rented from Store 1
-# ==================================================
+-- ==================================================
+-- BONUS 3
+-- DETERMINE WHETHER ACADEMY DINOSAUR CAN CURRENTLY
+-- BE RENTED FROM STORE 1
+-- ==================================================
 
 SELECT
-    f.title AS Film_title,
-    i.store_id AS Store_ID,
-    COUNT(DISTINCT i.inventory_id) AS Available_copies,
+    f.title AS film_title,
+    1 AS store_id,
+
+    COUNT(DISTINCT i.inventory_id) AS total_copies_in_store,
+
+    COUNT(
+        DISTINCT CASE
+            WHEN r.rental_id IS NULL
+            THEN i.inventory_id
+        END
+    ) AS available_copies,
+
     CASE
-        WHEN COUNT(DISTINCT i.inventory_id) > 0
-            THEN 'Available'
+        WHEN COUNT(
+            DISTINCT CASE
+                WHEN r.rental_id IS NULL
+                THEN i.inventory_id
+            END
+        ) > 0
+        THEN 'Available'
         ELSE 'NOT available'
-    END AS Availability_status
+    END AS availability_status
+
 FROM film AS f
-INNER JOIN inventory AS i
+
+LEFT JOIN inventory AS i
     ON f.film_id = i.film_id
+    AND i.store_id = 1
+
 LEFT JOIN rental AS r
     ON i.inventory_id = r.inventory_id
     AND r.return_date IS NULL
-WHERE
-    f.title = 'ACADEMY DINOSAUR'
-    AND i.store_id = 1
-    AND r.rental_id IS NULL
+
+WHERE LOWER(f.title) = 'academy dinosaur'
+
 GROUP BY
     f.film_id,
-    f.title,
-    i.store_id;
+    f.title;
 
 
-# ==================================================
-# BONUS 4
-# List all film titles and indicate whether each
-# film exists in the inventory
-# ==================================================
+-- ==================================================
+-- BONUS 4
+-- PROVIDE ALL DISTINCT FILM TITLES AND THEIR
+-- INVENTORY AVAILABILITY STATUS
+-- THIS CHECKS WHETHER A FILM EXISTS IN INVENTORY
+-- ==================================================
 
 SELECT
-    f.title AS Film_title,
+    f.title AS film_title,
+
     CASE
-        WHEN IFNULL(COUNT(i.inventory_id), 0) > 0
-            THEN 'Available'
+        WHEN COUNT(i.inventory_id) > 0
+        THEN 'Available'
         ELSE 'NOT available'
-    END AS Availability_status
+    END AS availability_status
+
 FROM film AS f
+
 LEFT JOIN inventory AS i
     ON f.film_id = i.film_id
+
 GROUP BY
     f.film_id,
     f.title
+
 ORDER BY
     f.title;
 
 
-# ==================================================
-# OPTIONAL CHECK
-# Confirm the number of films not found in inventory
-# Expected result is 42
-# ==================================================
+-- ==================================================
+-- OPTIONAL CHECK
+-- COUNT FILMS THAT DO NOT EXIST IN INVENTORY
+-- EXPECTED RESULT: 42
+-- ==================================================
 
 SELECT
-    COUNT(*) AS Films_not_in_inventory
+    COUNT(*) AS films_not_in_inventory
 FROM film AS f
 LEFT JOIN inventory AS i
     ON f.film_id = i.film_id
