@@ -67,7 +67,6 @@ JOIN film AS f
     ON fc.film_id = f.film_id
 GROUP BY c.category_id, c.name
 ORDER BY avg_running_time DESC
-LIMIT 1;
 
 -- 6. Bonus: Top 10 películas más alquiladas
 
