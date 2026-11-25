@@ -23,13 +23,13 @@ ON ct.country_id = c.country_id;
 
 
 -- 3.
-SELECT COUNT(p.amount) AS 'Revenue (Dollars)', s.store_id AS "Store"
+SELECT SUM(p.amount) AS 'Revenue (Dollars)', st.store_id AS "Store"
 FROM payment AS p
-JOIN rental AS r
-ON p.rental_id = r.rental_id
-JOIN staff AS s
-ON r.staff_id = s.staff_id
-GROUP BY store_id;
+JOIN staff AS st
+ON st.staff_id = p.staff_id
+JOIN store AS s
+ON st.store_id = s.store_id
+GROUP BY st.store_id;
 
 
 -- 4.
